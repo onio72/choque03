@@ -95,8 +95,9 @@
     <input type="range" id="velocity-blue" min="1" max="20" value="10">
     <span id="velocity-blue-val">10</span> m/s
 
-    <input type="range" id="restitution" min="0" max="1" step="0.01" value="0.5" class="hidden">
-    <span id="restitution-val" class="hidden">0.5</span>
+    <label for="restitution">Coeficiente de Restitución:</label>
+    <input type="range" id="restitution" min="0" max="1" step="0.01" value="0.5" disabled>
+    <span id="restitution-val">0.5</span>
 </div>
 
 <div id="controls">
@@ -222,10 +223,13 @@
     let massBlue = parseInt(massBlueSlider.value);
     let massRed = parseInt(massRedSlider.value);
     let velocityBlue = parseInt(velocityBlueSlider.value);
-    let restitution = parseFloat(restitutionSlider.value);
+    let restitution = Math.random().toFixed(2); // Valor aleatorio entre 0 y 1 con dos decimales
     let velocityRed = 0;
     let animationInterval;
     let slowMotion = false;
+
+    restitutionSlider.value = restitution;
+    restitutionValue.textContent = restitution;
 
     massBlueSlider.oninput = () => {
         massBlue = parseInt(massBlueSlider.value);
@@ -242,11 +246,6 @@
     velocityBlueSlider.oninput = () => {
         velocityBlue = parseInt(velocityBlueSlider.value);
         velocityBlueValue.textContent = velocityBlue;
-    };
-
-    restitutionSlider.oninput = () => {
-        restitution = parseFloat(restitutionSlider.value);
-        restitutionValue.textContent = restitution;
     };
 
     function updateSizes() {
@@ -340,6 +339,9 @@
         ballRed.x = 400;
         ballBlue.velocityX = 0;
         ballRed.velocityX = 0;
+        restitution = Math.random().toFixed(2); // Valor aleatorio entre 0 y 1 con dos decimales
+        restitutionSlider.value = restitution;
+        restitutionValue.textContent = restitution;
         slowMotion = false;
         slowMotionButton.textContent = 'Ralentizar';
         update();
