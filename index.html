@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Tema 10. Leyes de Newton. Choques (II)</title>
+    <title>Tema 10. Leyes de Newton. Choques (III)</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -73,11 +73,14 @@
         #calculations {
             text-align: center;
         }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
 
-<h1>Tema 10. Leyes de Newton. Choques (II)</h1>
+<h1>Tema 10. Leyes de Newton. Choques (III)</h1>
 
 <div id="controls">
     <label for="mass-blue">Masa Bola Azul:</label>
@@ -92,9 +95,8 @@
     <input type="range" id="velocity-blue" min="1" max="20" value="10">
     <span id="velocity-blue-val">10</span> m/s
 
-    <label for="restitution">Coeficiente de Restitución:</label>
-    <input type="range" id="restitution" min="0" max="1" step="0.01" value="0.5">
-    <span id="restitution-val">0.5</span>
+    <input type="range" id="restitution" min="0" max="1" step="0.01" value="0.5" class="hidden">
+    <span id="restitution-val" class="hidden">0.5</span>
 </div>
 
 <div id="controls">
