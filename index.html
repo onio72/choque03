@@ -91,6 +91,10 @@
     <label for="velocity-blue">Velocidad Bola Azul:</label>
     <input type="range" id="velocity-blue" min="1" max="20" value="10">
     <span id="velocity-blue-val">10</span> m/s
+
+    <label for="restitution">Coeficiente de Restitución:</label>
+    <input type="range" id="restitution" min="0" max="1" step="0.01" value="0.5">
+    <span id="restitution-val">0.5</span>
 </div>
 
 <div id="controls">
@@ -206,14 +210,17 @@
     const massBlueSlider = document.getElementById('mass-blue');
     const massRedSlider = document.getElementById('mass-red');
     const velocityBlueSlider = document.getElementById('velocity-blue');
+    const restitutionSlider = document.getElementById('restitution');
     const massBlueValue = document.getElementById('mass-blue-val');
     const massRedValue = document.getElementById('mass-red-val');
     const velocityBlueValue = document.getElementById('velocity-blue-val');
+    const restitutionValue = document.getElementById('restitution-val');
     const slowMotionButton = document.getElementById('slow-motion-button');
 
     let massBlue = parseInt(massBlueSlider.value);
     let massRed = parseInt(massRedSlider.value);
     let velocityBlue = parseInt(velocityBlueSlider.value);
+    let restitution = parseFloat(restitutionSlider.value);
     let velocityRed = 0;
     let animationInterval;
     let slowMotion = false;
@@ -233,6 +240,11 @@
     velocityBlueSlider.oninput = () => {
         velocityBlue = parseInt(velocityBlueSlider.value);
         velocityBlueValue.textContent = velocityBlue;
+    };
+
+    restitutionSlider.oninput = () => {
+        restitution = parseFloat(restitutionSlider.value);
+        restitutionValue.textContent = restitution;
     };
 
     function updateSizes() {
@@ -290,9 +302,10 @@
         ballRed.x += ballRed.velocityX;
 
         if (ballBlue.x + ballBlue.radius >= ballRed.x - ballRed.radius) {
-            const finalVelocityRed = (2 * massBlue * velocityBlue) / (massBlue + massRed);
+            const finalVelocityBlue = (massBlue * velocityBlue + massRed * velocityRed + massRed * restitution * (velocityRed - velocityBlue)) / (massBlue + massRed);
+            const finalVelocityRed = (massBlue * velocityBlue + massRed * velocityRed + massBlue * restitution * (velocityBlue - velocityRed)) / (massBlue + massRed);
+            ballBlue.velocityX = finalVelocityBlue;
             ballRed.velocityX = finalVelocityRed;
-            ballBlue.velocityX = 0;
         }
 
         if (ballRed.x - ballRed.radius > canvas.width) {
@@ -354,15 +367,15 @@
         const correctP_A_antes = massBlue * velocityBlue;
         const correctP_R_antes = 0;
         const correctP_T_antes = correctP_A_antes + correctP_R_antes;
-        const correctP_A_despues = 0;
-        const correctP_R_despues = (2 * massBlue * velocityBlue) / (massBlue + massRed) * massRed;
+        const correctP_A_despues = massBlue * ((massBlue * velocityBlue + massRed * velocityRed + massRed * restitution * (velocityRed - velocityBlue)) / (massBlue + massRed));
+        const correctP_R_despues = massRed * ((massBlue * velocityBlue + massRed * velocityRed + massBlue * restitution * (velocityBlue - velocityRed)) / (massBlue + massRed));
         const correctP_T_despues = correctP_A_despues + correctP_R_despues;
 
         const correctEC_A_antes = 0.5 * massBlue * Math.pow(velocityBlue, 2);
         const correctEC_R_antes = 0;
         const correctEC_T_antes = correctEC_A_antes + correctEC_R_antes;
-        const correctEC_A_despues = 0;
-        const correctEC_R_despues = 0.5 * massRed * Math.pow((2 * massBlue * velocityBlue) / (massBlue + massRed), 2);
+        const correctEC_A_despues = 0.5 * massBlue * Math.pow((massBlue * velocityBlue + massRed * velocityRed + massRed * restitution * (velocityRed - velocityBlue)) / (massBlue + massRed), 2);
+        const correctEC_R_despues = 0.5 * massRed * Math.pow((massBlue * velocityBlue + massRed * velocityRed + massBlue * restitution * (velocityBlue - velocityRed)) / (massBlue + massRed), 2);
         const correctEC_T_despues = correctEC_A_despues + correctEC_R_despues;
 
         validateAnswer('pA-antes', pA_antes, correctP_A_antes);
@@ -381,12 +394,16 @@
         validateQuestion('q1', 'Falso');
         validateQuestion('q2', 'Verdadero');
         validateQuestion('q3', 'Falso');
-        validateQuestion('q4', 'Verdadero');
-        validateQuestion('q5', 'Elástico');
+        validateQuestion('q4', 'Falso');
+        validateQuestion('q5', 'Inelástico');
     }
 
     function validateAnswer(id, givenValue, correctValue) {
         const input = document.getElementById(id);
+        const resultElement = input.nextElementSibling;
+        if (resultElement && resultElement.tagName === 'SPAN') {
+            resultElement.remove();
+        }
         if (Math.abs(givenValue - correctValue) < 0.01) {
             input.insertAdjacentHTML('afterend', ' <span class="result-ok">&#10004;</span>');
         } else {
@@ -397,6 +414,10 @@
     function validateQuestion(id, correctAnswer) {
         const question = document.getElementById(id);
         const givenAnswer = question.value;
+        const resultElement = question.nextElementSibling;
+        if (resultElement && resultElement.tagName === 'SPAN') {
+            resultElement.remove();
+        }
         if (givenAnswer === correctAnswer) {
             question.insertAdjacentHTML('afterend', ' <span class="result-ok">&#10004;</span>');
         } else {
