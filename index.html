@@ -72,9 +72,14 @@
         }
         #calculations {
             text-align: center;
+            font-size: smaller.
         }
         .hidden {
             display: none;
+        }
+        input[disabled] {
+            background-color: #f0f0f0;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -92,12 +97,16 @@
     <span id="mass-red-val">5</span> kg
 
     <label for="velocity-blue">Velocidad Bola Azul:</label>
-    <input type="range" id="velocity-blue" min="1" max="20" value="10" disabled>
+    <input type="range" id="velocity-blue" min="-20" max="20" value="10" disabled>
     <span id="velocity-blue-val">10</span> m/s
 
+    <label for="velocity-red">Velocidad Bola Roja:</label>
+    <input type="range" id="velocity-red" min="-20" max="20" value="0" disabled>
+    <span id="velocity-red-val">0</span> m/s
+
     <label for="restitution">Coeficiente de Restitución:</label>
-    <input type="range" id="restitution" min="0" max="1" step="0.01" value="0.5" disabled>
-    <span id="restitution-val">0.5</span>
+    <input type="range" id="restitution" min="0.2" max="0.8" step="0.2" value="1" disabled>
+    <span id="restitution-val">1</span>
 </div>
 
 <div id="controls">
@@ -112,7 +121,8 @@
 </div>
 
 <div id="calculations">
-    <p>Realiza los cálculos adecuados redondeando hasta la centésima y completa la tabla. Para comprobar si tus cálculos son correctos pulsa el botón Enviar.</p>
+    <p>Realiza los cálculos adecuados redondeando hasta la centésima y completa la tabla. Usa el punto como separador decimal. Para comprobar si tus cálculos son correctos pulsa el botón Enviar.</p>
+    <p>Calcula los momentos lineales de ambas bolas y del conjunto, antes y después de la colisión.</p>
     <table>
         <tr>
             <th></th>
@@ -133,7 +143,7 @@
             <td><input class="input-box" id="pT-despues"> kg.m/s</td>
         </tr>
     </table>
-
+    <p>Calcula las energías cinéticas de ambas bolas y del conjunto, antes y después de la colisión.</p>
     <table>
         <tr>
             <th></th>
@@ -195,7 +205,10 @@
     </label>
 </div>
 
-<button onclick="checkAnswers()" style="display: block; margin: 20px auto;">Enviar</button>
+<div id="controls">
+    <button onclick="checkAnswers()" style="display: inline-block; margin: 20px auto;">Enviar</button>
+    <button onclick="newExample()" style="display: inline-block; margin: 20px auto;">Otro ejemplo</button>
+</div>
 
 <footer>
     Antonio González García<br>
@@ -213,52 +226,62 @@
     const massBlueSlider = document.getElementById('mass-blue');
     const massRedSlider = document.getElementById('mass-red');
     const velocityBlueSlider = document.getElementById('velocity-blue');
-    const restitutionSlider = document.getElementById('restitution');
+    const velocityRedSlider = document.getElementById('velocity-red');
     const massBlueValue = document.getElementById('mass-blue-val');
     const massRedValue = document.getElementById('mass-red-val');
     const velocityBlueValue = document.getElementById('velocity-blue-val');
+    const velocityRedValue = document.getElementById('velocity-red-val');
+    const restitutionSlider = document.getElementById('restitution');
     const restitutionValue = document.getElementById('restitution-val');
     const slowMotionButton = document.getElementById('slow-motion-button');
 
-    let massBlue = Math.floor(Math.random() * 10) + 1; // Valor aleatorio entre 1 y 10
-    let massRed = Math.floor(Math.random() * 10) + 1; // Valor aleatorio entre 1 y 10
-    let velocityBlue = Math.floor(Math.random() * 20) + 1; // Valor aleatorio entre 1 y 20
-    let restitution = Math.random().toFixed(2); // Valor aleatorio entre 0 y 1 con dos decimales
-    let velocityRed = 0;
+    let mass = Math.floor(Math.random() * 10) + 1; // Valor aleatorio entre 1 y 10
+    let velocityBlue = Math.floor(Math.random() * 40) - 20; // Valor aleatorio entre -20 y 20
+    let velocityRed = Math.floor(Math.random() * 40) - 20; // Valor aleatorio entre -20 y 20
+    let restitution = [0.2, 0.4, 0.6, 0.8][Math.floor(Math.random() * 4)]; // Coeficiente de restitución aleatorio entre 0.2, 0.4, 0.6 y 0.8
     let animationInterval;
     let slowMotion = false;
 
-    massBlueSlider.value = massBlue;
-    massBlueValue.textContent = massBlue;
+    function updateSliders() {
+        massBlueSlider.value = mass;
+        massBlueValue.textContent = mass;
 
-    massRedSlider.value = massRed;
-    massRedValue.textContent = massRed;
+        massRedSlider.value = mass;
+        massRedValue.textContent = mass;
 
-    velocityBlueSlider.value = velocityBlue;
-    velocityBlueValue.textContent = velocityBlue;
+        velocityBlueSlider.value = velocityBlue;
+        velocityBlueValue.textContent = velocityBlue;
 
-    restitutionSlider.value = restitution;
-    restitutionValue.textContent = restitution;
+        velocityRedSlider.value = velocityRed;
+        velocityRedValue.textContent = velocityRed;
+
+        restitutionSlider.value = restitution;
+        restitutionValue.textContent = restitution;
+    }
+
+    updateSliders();
 
     function updateSizes() {
-        ballBlue.radius = 20 + (massBlue - 1) * 3;
-        ballRed.radius = 20 + (massRed - 1) * 3;
+        ballBlue.radius = 20 + (mass - 1) * 3;
+        ballRed.radius = 20 + (mass - 1) * 3;
     }
 
     const ballBlue = {
         x: 50,
         y: canvas.height / 2,
-        radius: 35,
+        radius: 20 + (mass - 1) * 3,
         color: 'blue',
-        velocityX: 0
+        velocityX: 0,
+        mass: mass
     };
 
     const ballRed = {
-        x: 400,
+        x: 750,
         y: canvas.height / 2,
-        radius: 35,
+        radius: 20 + (mass - 1) * 3,
         color: 'red',
-        velocityX: 0
+        velocityX: 0,
+        mass: mass
     };
 
     function drawBall(ball) {
@@ -267,6 +290,9 @@
         ctx.fillStyle = ball.color;
         ctx.fill();
         ctx.closePath();
+        ctx.fillStyle = 'white';
+        ctx.font = '14px Arial';
+        ctx.fillText(`${ball.mass} kg`, ball.x - 15, ball.y + 5);
     }
 
     function drawGrid() {
@@ -295,17 +321,22 @@
         ballRed.x += ballRed.velocityX;
 
         if (ballBlue.x + ballBlue.radius >= ballRed.x - ballRed.radius) {
-            const finalVelocityBlue = (massBlue * velocityBlue + massRed * velocityRed + massRed * restitution * (velocityRed - velocityBlue)) / (massBlue + massRed);
-            const finalVelocityRed = (massBlue * velocityBlue + massRed * velocityRed + massBlue * restitution * (velocityBlue - velocityRed)) / (massBlue + massRed);
-            ballBlue.velocityX = finalVelocityBlue;
-            ballRed.velocityX = finalVelocityRed;
+            const newVelocityBlue = (ballBlue.velocityX * (ballBlue.mass - ballRed.mass) + (2 * ballRed.mass * ballRed.velocityX)) / (ballBlue.mass + ballRed.mass) * restitution;
+            const newVelocityRed = (ballRed.velocityX * (ballRed.mass - ballBlue.mass) + (2 * ballBlue.mass * ballBlue.velocityX)) / (ballRed.mass + ballBlue.mass) * restitution;
+            ballBlue.velocityX = newVelocityBlue;
+            ballRed.velocityX = newVelocityRed;
         }
 
         if (ballRed.x - ballRed.radius > canvas.width) {
-            ballRed.x += ballRed.velocityX;
+            ballRed.x = canvas.width - ballRed.radius;
+        }
+
+        if (ballBlue.x + ballBlue.radius < 0) {
+            ballBlue.x = ballBlue.radius;
         }
 
         ctx.fillStyle = 'black';
+        ctx.font = '16px Arial';
         ctx.fillText(`${ballBlue.velocityX.toFixed(2)} m/s`, ballBlue.x - 20, ballBlue.y - ballBlue.radius - 10);
         ctx.fillText(`${ballRed.velocityX.toFixed(2)} m/s`, ballRed.x - 20, ballRed.y - ballRed.radius - 10);
     }
@@ -327,30 +358,18 @@
     };
 
     document.getElementById('reset-button').onclick = () => {
-        massBlue = Math.floor(Math.random() * 10) + 1; // Valor aleatorio entre 1 y 10
-        massRed = Math.floor(Math.random() * 10) + 1; // Valor aleatorio entre 1 y 10
-        velocityBlue = Math.floor(Math.random() * 20) + 1; // Valor aleatorio entre 1 y 20
-        restitution = Math.random().toFixed(2); // Valor aleatorio entre 0 y 1 con dos decimales
-
-        massBlueSlider.value = massBlue;
-        massBlueValue.textContent = massBlue;
-
-        massRedSlider.value = massRed;
-        massRedValue.textContent = massRed;
-
-        velocityBlueSlider.value = velocityBlue;
-        velocityBlueValue.textContent = velocityBlue;
-
-        restitutionSlider.value = restitution;
-        restitutionValue.textContent = restitution;
-
+        mass = Math.floor(Math.random() * 10) + 1; // Valor aleatorio entre 1 y 10
+        velocityBlue = Math.floor(Math.random() * 40) - 20; // Valor aleatorio entre -20 y 20
+        velocityRed = Math.floor(Math.random() * 40) - 20; // Valor aleatorio entre -20 y 20
+        restitution = [0.2, 0.4, 0.6, 0.8][Math.floor(Math.random() * 4)]; // Coeficiente de restitución aleatorio entre 0.2, 0.4, 0.6 y 0.8
+        ballRed.x = 750;
         ballBlue.x = 50;
-        ballRed.x = 400;
+        updateSliders();
+        updateSizes();
+        ballBlue.mass = mass;
+        ballRed.mass = mass;
         ballBlue.velocityX = 0;
         ballRed.velocityX = 0;
-        updateSizes();
-        slowMotion = false;
-        slowMotionButton.textContent = 'Ralentizar';
         update();
     };
 
@@ -374,48 +393,49 @@
         const ecR_despues = parseFloat(document.getElementById('ecR-despues').value);
         const ecT_despues = parseFloat(document.getElementById('ecT-despues').value);
 
-        // Check calculations
-        const correctP_A_antes = massBlue * velocityBlue;
-        const correctP_R_antes = 0;
+        const correctP_A_antes = mass * velocityBlue;
+        const correctP_R_antes = mass * velocityRed;
         const correctP_T_antes = correctP_A_antes + correctP_R_antes;
-        const correctP_A_despues = massBlue * ((massBlue * velocityBlue + massRed * velocityRed + massRed * restitution * (velocityRed - velocityBlue)) / (massBlue + massRed));
-        const correctP_R_despues = massRed * ((massBlue * velocityBlue + massRed * velocityRed + massBlue * restitution * (velocityBlue - velocityRed)) / (massBlue + massRed));
+        const correctP_A_despues = mass * ballBlue.velocityX;
+        const correctP_R_despues = mass * ballRed.velocityX;
         const correctP_T_despues = correctP_A_despues + correctP_R_despues;
 
-        const correctEC_A_antes = 0.5 * massBlue * Math.pow(velocityBlue, 2);
-        const correctEC_R_antes = 0;
+        const correctEC_A_antes = 0.5 * mass * Math.pow(velocityBlue, 2);
+        const correctEC_R_antes = 0.5 * mass * Math.pow(velocityRed, 2);
         const correctEC_T_antes = correctEC_A_antes + correctEC_R_antes;
-        const correctEC_A_despues = 0.5 * massBlue * Math.pow((massBlue * velocityBlue + massRed * velocityRed + massRed * restitution * (velocityRed - velocityBlue)) / (massBlue + massRed), 2);
-        const correctEC_R_despues = 0.5 * massRed * Math.pow((massBlue * velocityBlue + massRed * velocityRed + massBlue * restitution * (velocityBlue - velocityRed)) / (massBlue + massRed), 2);
+        const correctEC_A_despues = 0.5 * mass * Math.pow(ballBlue.velocityX, 2);
+        const correctEC_R_despues = 0.5 * mass * Math.pow(ballRed.velocityX, 2);
         const correctEC_T_despues = correctEC_A_despues + correctEC_R_despues;
 
         validateAnswer('pA-antes', pA_antes, correctP_A_antes);
-        validateAnswer('pR-antes', pR_antes, correctP_R_antes);
+        validateAnswer('pR-antes', pR_antes, correctP_R_antes, true);
         validateAnswer('pT-antes', pT_antes, correctP_T_antes);
-        validateAnswer('pA-despues', pA_despues, correctP_A_despues);
+        validateAnswer('pA-despues', pA_despues, correctP_A_despues, true);
         validateAnswer('pR-despues', pR_despues, correctP_R_despues);
         validateAnswer('pT-despues', pT_despues, correctP_T_despues);
         validateAnswer('ecA-antes', ecA_antes, correctEC_A_antes);
-        validateAnswer('ecR-antes', ecR_antes, correctEC_R_antes);
+        validateAnswer('ecR-antes', ecR_antes, correctEC_R_antes, true);
         validateAnswer('ecT-antes', ecT_antes, correctEC_T_antes);
-        validateAnswer('ecA-despues', ecA_despues, correctEC_A_despues);
+        validateAnswer('ecA-despues', ecA_despues, correctEC_A_despues, true);
         validateAnswer('ecR-despues', ecR_despues, correctEC_R_despues);
         validateAnswer('ecT-despues', ecT_despues, correctEC_T_despues);
 
         validateQuestion('q1', 'Falso');
         validateQuestion('q2', 'Verdadero');
         validateQuestion('q3', 'Falso');
-        validateQuestion('q4', 'Falso');
-        validateQuestion('q5', 'Inelástico');
+        validateQuestion('q4', 'Verdadero');
+        validateQuestion('q5', restitution === 1 ? 'Elástico' : 'Inelástico');
     }
 
-    function validateAnswer(id, givenValue, correctValue) {
+    function validateAnswer(id, givenValue, correctValue, allowZero = false) {
         const input = document.getElementById(id);
         const resultElement = input.nextElementSibling;
         if (resultElement && resultElement.tagName === 'SPAN') {
             resultElement.remove();
         }
-        if (Math.abs(givenValue - correctValue) < 0.01) {
+        if (allowZero && givenValue === 0) {
+            input.insertAdjacentHTML('afterend', ' <span class="result-ok">&#10004;</span>');
+        } else if (Math.abs((givenValue - correctValue) / correctValue) < 0.02) { // Tolerancia del 2%
             input.insertAdjacentHTML('afterend', ' <span class="result-ok">&#10004;</span>');
         } else {
             input.insertAdjacentHTML('afterend', ' <span class="result-ko">&#10008;</span>');
@@ -434,6 +454,22 @@
         } else {
             question.insertAdjacentHTML('afterend', ' <span class="result-ko">&#10008;</span>');
         }
+    }
+
+    function newExample() {
+        mass = Math.floor(Math.random() * 10) + 1; // Valor aleatorio entre 1 y 10
+        velocityBlue = Math.floor(Math.random() * 40) - 20; // Valor aleatorio entre -20 y 20
+        velocityRed = Math.floor(Math.random() * 40) - 20; // Valor aleatorio entre -20 y 20
+        restitution = [0.2, 0.4, 0.6, 0.8][Math.floor(Math.random() * 4)]; // Coeficiente de restitución aleatorio entre 0.2, 0.4, 0.6 y 0.8
+        ballRed.x = 750;
+        ballBlue.x = 50;
+        updateSliders();
+        updateSizes();
+        ballBlue.mass = mass;
+        ballRed.mass = mass;
+        ballBlue.velocityX = 0;
+        ballRed.velocityX = 0;
+        update();
     }
 
     update();
