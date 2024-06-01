@@ -236,8 +236,31 @@
     const slowMotionButton = document.getElementById('slow-motion-button');
 
     let mass = Math.floor(Math.random() * 10) + 1; // Valor aleatorio entre 1 y 10
-    let velocityBlue = Math.floor(Math.random() * 40) - 20; // Valor aleatorio entre -20 y 20
-    let velocityRed = Math.floor(Math.random() * 40) - 20; // Valor aleatorio entre -20 y 20
+    let velocityBlue, velocityRed;
+
+    // Determinar el escenario inicial
+    const scenario = Math.floor(Math.random() * 3);
+    switch (scenario) {
+        case 0: // Bola azul se mueve a la derecha, roja está quieta
+            velocityBlue = Math.floor(Math.random() * 20) + 1;
+            velocityRed = 0;
+            ballBlue = { x: 50, y: canvas.height / 2, radius: 20 + (mass - 1) * 3, color: 'blue', velocityX: velocityBlue, mass: mass };
+            ballRed = { x: 400, y: canvas.height / 2, radius: 20 + (mass - 1) * 3, color: 'red', velocityX: velocityRed, mass: mass };
+            break;
+        case 1: // Bola roja se mueve a la izquierda, azul está quieta
+            velocityBlue = 0;
+            velocityRed = -(Math.floor(Math.random() * 20) + 1);
+            ballBlue = { x: 400, y: canvas.height / 2, radius: 20 + (mass - 1) * 3, color: 'blue', velocityX: velocityBlue, mass: mass };
+            ballRed = { x: 750, y: canvas.height / 2, radius: 20 + (mass - 1) * 3, color: 'red', velocityX: velocityRed, mass: mass };
+            break;
+        case 2: // Ambas se mueven hacia el encuentro
+            velocityBlue = Math.floor(Math.random() * 20) + 1;
+            velocityRed = -(Math.floor(Math.random() * 20) + 1);
+            ballBlue = { x: 50, y: canvas.height / 2, radius: 20 + (mass - 1) * 3, color: 'blue', velocityX: velocityBlue, mass: mass };
+            ballRed = { x: 750, y: canvas.height / 2, radius: 20 + (mass - 1) * 3, color: 'red', velocityX: velocityRed, mass: mass };
+            break;
+    }
+
     let restitution = [0.2, 0.4, 0.6, 0.8][Math.floor(Math.random() * 4)]; // Coeficiente de restitución aleatorio entre 0.2, 0.4, 0.6 y 0.8
     let animationInterval;
     let slowMotion = false;
@@ -265,24 +288,6 @@
         ballBlue.radius = 20 + (mass - 1) * 3;
         ballRed.radius = 20 + (mass - 1) * 3;
     }
-
-    const ballBlue = {
-        x: 50,
-        y: canvas.height / 2,
-        radius: 20 + (mass - 1) * 3,
-        color: 'blue',
-        velocityX: 0,
-        mass: mass
-    };
-
-    const ballRed = {
-        x: 750,
-        y: canvas.height / 2,
-        radius: 20 + (mass - 1) * 3,
-        color: 'red',
-        velocityX: 0,
-        mass: mass
-    };
 
     function drawBall(ball) {
         ctx.beginPath();
@@ -359,11 +364,31 @@
 
     document.getElementById('reset-button').onclick = () => {
         mass = Math.floor(Math.random() * 10) + 1; // Valor aleatorio entre 1 y 10
-        velocityBlue = Math.floor(Math.random() * 40) - 20; // Valor aleatorio entre -20 y 20
-        velocityRed = Math.floor(Math.random() * 40) - 20; // Valor aleatorio entre -20 y 20
         restitution = [0.2, 0.4, 0.6, 0.8][Math.floor(Math.random() * 4)]; // Coeficiente de restitución aleatorio entre 0.2, 0.4, 0.6 y 0.8
-        ballRed.x = 750;
-        ballBlue.x = 50;
+
+        // Determinar el escenario inicial
+        const scenario = Math.floor(Math.random() * 3);
+        switch (scenario) {
+            case 0: // Bola azul se mueve a la derecha, roja está quieta
+                velocityBlue = Math.floor(Math.random() * 20) + 1;
+                velocityRed = 0;
+                ballBlue.x = 50;
+                ballRed.x = 400;
+                break;
+            case 1: // Bola roja se mueve a la izquierda, azul está quieta
+                velocityBlue = 0;
+                velocityRed = -(Math.floor(Math.random() * 20) + 1);
+                ballBlue.x = 400;
+                ballRed.x = 750;
+                break;
+            case 2: // Ambas se mueven hacia el encuentro
+                velocityBlue = Math.floor(Math.random() * 20) + 1;
+                velocityRed = -(Math.floor(Math.random() * 20) + 1);
+                ballBlue.x = 50;
+                ballRed.x = 750;
+                break;
+        }
+
         updateSliders();
         updateSizes();
         ballBlue.mass = mass;
@@ -423,7 +448,7 @@
         validateQuestion('q1', 'Falso');
         validateQuestion('q2', 'Verdadero');
         validateQuestion('q3', 'Falso');
-        validateQuestion('q4', 'Falso'); // La energía cinética total no se conserva debido a la restitución inelástica
+        validateQuestion('q4', restitution === 1 ? 'Verdadero' : 'Falso');
         validateQuestion('q5', restitution === 1 ? 'Elástico' : 'Inelástico');
     }
 
@@ -458,11 +483,31 @@
 
     function newExample() {
         mass = Math.floor(Math.random() * 10) + 1; // Valor aleatorio entre 1 y 10
-        velocityBlue = Math.floor(Math.random() * 40) - 20; // Valor aleatorio entre -20 y 20
-        velocityRed = Math.floor(Math.random() * 40) - 20; // Valor aleatorio entre -20 y 20
         restitution = [0.2, 0.4, 0.6, 0.8][Math.floor(Math.random() * 4)]; // Coeficiente de restitución aleatorio entre 0.2, 0.4, 0.6 y 0.8
-        ballRed.x = 750;
-        ballBlue.x = 50;
+
+        // Determinar el escenario inicial
+        const scenario = Math.floor(Math.random() * 3);
+        switch (scenario) {
+            case 0: // Bola azul se mueve a la derecha, roja está quieta
+                velocityBlue = Math.floor(Math.random() * 20) + 1;
+                velocityRed = 0;
+                ballBlue.x = 50;
+                ballRed.x = 400;
+                break;
+            case 1: // Bola roja se mueve a la izquierda, azul está quieta
+                velocityBlue = 0;
+                velocityRed = -(Math.floor(Math.random() * 20) + 1);
+                ballBlue.x = 400;
+                ballRed.x = 750;
+                break;
+            case 2: // Ambas se mueven hacia el encuentro
+                velocityBlue = Math.floor(Math.random() * 20) + 1;
+                velocityRed = -(Math.floor(Math.random() * 20) + 1);
+                ballBlue.x = 50;
+                ballRed.x = 750;
+                break;
+        }
+
         updateSliders();
         updateSizes();
         ballBlue.mass = mass;
