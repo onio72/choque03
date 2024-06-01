@@ -238,6 +238,8 @@
     let mass, velocityBlue, velocityRed, restitution;
     let ballBlue, ballRed;
     let initialBallBlue, initialBallRed;
+    let animationInterval;
+    let slowMotion = false;
 
     function initialize() {
         mass = Math.floor(Math.random() * 10) + 1; // Valor aleatorio entre 1 y 10
@@ -373,6 +375,8 @@
     document.getElementById('reset-button').onclick = () => {
         ballBlue = { ...initialBallBlue };
         ballRed = { ...initialBallRed };
+        ballBlue.velocityX = initialBallBlue.velocityX;
+        ballRed.velocityX = initialBallRed.velocityX;
         update();
     };
 
@@ -462,8 +466,8 @@
     function newExample() {
         initialize();
         updateSizes();
-        ballBlue.velocityX = 0;
-        ballRed.velocityX = 0;
+        ballBlue.velocityX = initialBallBlue.velocityX;
+        ballRed.velocityX = initialBallRed.velocityX;
         update();
     }
 
