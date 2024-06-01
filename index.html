@@ -328,11 +328,11 @@
         }
 
         if (ballRed.x - ballRed.radius > canvas.width) {
-            ballRed.x = canvas.width - ballRed.radius;
+            ballRed.x = canvas.width + ballRed.radius; // Coloca la bola fuera del canvas
         }
 
         if (ballBlue.x + ballBlue.radius < 0) {
-            ballBlue.x = ballBlue.radius;
+            ballBlue.x = -ballBlue.radius; // Coloca la bola fuera del canvas
         }
 
         ctx.fillStyle = 'black';
@@ -423,7 +423,7 @@
         validateQuestion('q1', 'Falso');
         validateQuestion('q2', 'Verdadero');
         validateQuestion('q3', 'Falso');
-        validateQuestion('q4', 'Verdadero');
+        validateQuestion('q4', 'Falso'); // La energía cinética total no se conserva debido a la restitución inelástica
         validateQuestion('q5', restitution === 1 ? 'Elástico' : 'Inelástico');
     }
 
