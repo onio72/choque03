@@ -244,26 +244,38 @@
         case 0: // Bola azul se mueve a la derecha, roja está quieta
             velocityBlue = Math.floor(Math.random() * 20) + 1;
             velocityRed = 0;
-            ballBlue = { x: 50, y: canvas.height / 2, radius: 20 + (mass - 1) * 3, color: 'blue', velocityX: velocityBlue, mass: mass };
-            ballRed = { x: 400, y: canvas.height / 2, radius: 20 + (mass - 1) * 3, color: 'red', velocityX: velocityRed, mass: mass };
             break;
         case 1: // Bola roja se mueve a la izquierda, azul está quieta
             velocityBlue = 0;
             velocityRed = -(Math.floor(Math.random() * 20) + 1);
-            ballBlue = { x: 400, y: canvas.height / 2, radius: 20 + (mass - 1) * 3, color: 'blue', velocityX: velocityBlue, mass: mass };
-            ballRed = { x: 750, y: canvas.height / 2, radius: 20 + (mass - 1) * 3, color: 'red', velocityX: velocityRed, mass: mass };
             break;
         case 2: // Ambas se mueven hacia el encuentro
             velocityBlue = Math.floor(Math.random() * 20) + 1;
             velocityRed = -(Math.floor(Math.random() * 20) + 1);
-            ballBlue = { x: 50, y: canvas.height / 2, radius: 20 + (mass - 1) * 3, color: 'blue', velocityX: velocityBlue, mass: mass };
-            ballRed = { x: 750, y: canvas.height / 2, radius: 20 + (mass - 1) * 3, color: 'red', velocityX: velocityRed, mass: mass };
             break;
     }
 
     let restitution = [0.2, 0.4, 0.6, 0.8][Math.floor(Math.random() * 4)]; // Coeficiente de restitución aleatorio entre 0.2, 0.4, 0.6 y 0.8
     let animationInterval;
     let slowMotion = false;
+
+    const ballBlue = {
+        x: scenario === 1 ? 400 : 50,
+        y: canvas.height / 2,
+        radius: 20 + (mass - 1) * 3,
+        color: 'blue',
+        velocityX: 0,
+        mass: mass
+    };
+
+    const ballRed = {
+        x: scenario === 0 ? 400 : 750,
+        y: canvas.height / 2,
+        radius: 20 + (mass - 1) * 3,
+        color: 'red',
+        velocityX: 0,
+        mass: mass
+    };
 
     function updateSliders() {
         massBlueSlider.value = mass;
@@ -330,6 +342,9 @@
             const newVelocityRed = (ballRed.velocityX * (ballRed.mass - ballBlue.mass) + (2 * ballBlue.mass * ballBlue.velocityX)) / (ballRed.mass + ballBlue.mass) * restitution;
             ballBlue.velocityX = newVelocityBlue;
             ballRed.velocityX = newVelocityRed;
+
+            // Evitar vibraciones colocando las bolas una distancia mínima después de la colisión
+            ballBlue.x = ballRed.x - ballRed.radius - ballBlue.radius;
         }
 
         if (ballRed.x - ballRed.radius > canvas.width) {
