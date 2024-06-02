@@ -407,15 +407,15 @@
         const ecR_despues = parseFloat(document.getElementById('ecR-despues').value);
         const ecT_despues = parseFloat(document.getElementById('ecT-despues').value);
 
-        const correctP_A_antes = mass * velocityBlue;
-        const correctP_R_antes = mass * velocityRed;
+        const correctP_A_antes = mass * (initialBallBlue.velocityX !== undefined ? initialBallBlue.velocityX : 0);
+        const correctP_R_antes = mass * (initialBallRed.velocityX !== undefined ? initialBallRed.velocityX : 0);
         const correctP_T_antes = correctP_A_antes + correctP_R_antes;
         const correctP_A_despues = mass * ballBlue.velocityX;
         const correctP_R_despues = mass * ballRed.velocityX;
         const correctP_T_despues = correctP_A_despues + correctP_R_despues;
 
-        const correctEC_A_antes = 0.5 * mass * Math.pow(velocityBlue, 2);
-        const correctEC_R_antes = 0.5 * mass * Math.pow(velocityRed, 2);
+        const correctEC_A_antes = 0.5 * mass * Math.pow(initialBallBlue.velocityX !== undefined ? initialBallBlue.velocityX : 0, 2);
+        const correctEC_R_antes = 0.5 * mass * Math.pow(initialBallRed.velocityX !== undefined ? initialBallRed.velocityX : 0, 2);
         const correctEC_T_antes = correctEC_A_antes + correctEC_R_antes;
         const correctEC_A_despues = 0.5 * mass * Math.pow(ballBlue.velocityX, 2);
         const correctEC_R_despues = 0.5 * mass * Math.pow(ballRed.velocityX, 2);
