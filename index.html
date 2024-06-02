@@ -349,12 +349,10 @@
             ballBlue.x = ballRed.x - ballRed.radius - ballBlue.radius;
         }
 
-        if (ballRed.x - ballRed.radius > canvas.width) {
-            ballRed.x = canvas.width + ballRed.radius; // Coloca la bola fuera del canvas
-        }
-
-        if (ballBlue.x + ballBlue.radius < 0) {
-            ballBlue.x = -ballBlue.radius; // Coloca la bola fuera del canvas
+        // Detener la animación cuando ambas bolas estén fuera de la vista
+        if ((ballRed.x - ballRed.radius > canvas.width && ballBlue.x + ballBlue.radius < 0) ||
+            (ballRed.x + ballRed.radius < 0 && ballBlue.x - ballBlue.radius > canvas.width)) {
+            clearInterval(animationInterval);
         }
 
         ctx.fillStyle = 'black';
