@@ -333,10 +333,17 @@
         ballRed.x += ballRed.velocityX;
 
         if (ballBlue.x + ballBlue.radius >= ballRed.x - ballRed.radius) {
-            const newVelocityBlue = (ballBlue.velocityX * (ballBlue.mass - ballRed.mass) + (2 * ballRed.mass * ballRed.velocityX)) / (ballBlue.mass + ballRed.mass) * restitution;
-            const newVelocityRed = (ballRed.velocityX * (ballRed.mass - ballBlue.mass) + (2 * ballBlue.mass * ballBlue.velocityX)) / (ballRed.mass + ballBlue.mass) * restitution;
-            ballBlue.velocityX = newVelocityBlue;
-            ballRed.velocityX = newVelocityRed;
+            // Aplicar las fórmulas de conservación del momento lineal y energía cinética para colisiones elásticas
+            const u1 = ballBlue.velocityX;
+            const u2 = ballRed.velocityX;
+            const m1 = ballBlue.mass;
+            const m2 = ballRed.mass;
+
+            const v1 = (u1 * (m1 - m2) + 2 * m2 * u2) / (m1 + m2);
+            const v2 = (u2 * (m2 - m1) + 2 * m1 * u1) / (m1 + m2);
+
+            ballBlue.velocityX = v1;
+            ballRed.velocityX = v2;
 
             // Evitar vibraciones colocando las bolas una distancia mínima después de la colisión
             ballBlue.x = ballRed.x - ballRed.radius - ballBlue.radius;
