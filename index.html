@@ -333,14 +333,14 @@
         ballRed.x += ballRed.velocityX;
 
         if (ballBlue.x + ballBlue.radius >= ballRed.x - ballRed.radius) {
-            // Aplicar las fórmulas de conservación del momento lineal y energía cinética para colisiones elásticas
+            // Aplicar las fórmulas de conservación del momento lineal y el coeficiente de restitución
             const u1 = ballBlue.velocityX;
             const u2 = ballRed.velocityX;
             const m1 = ballBlue.mass;
             const m2 = ballRed.mass;
 
-            const v1 = (u1 * (m1 - m2) + 2 * m2 * u2) / (m1 + m2);
-            const v2 = (u2 * (m2 - m1) + 2 * m1 * u1) / (m1 + m2);
+            const v1 = ((m1 - restitution * m2) * u1 + (1 + restitution) * m2 * u2) / (m1 + m2);
+            const v2 = ((m2 - restitution * m1) * u2 + (1 + restitution) * m1 * u1) / (m1 + m2);
 
             ballBlue.velocityX = v1;
             ballRed.velocityX = v2;
